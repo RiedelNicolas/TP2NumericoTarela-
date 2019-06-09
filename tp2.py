@@ -4,3 +4,4 @@
 
 
 from constant import *
+from metodos_numericos import *

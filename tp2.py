@@ -10,6 +10,10 @@ from math import *
 def aceleracion(alpha, beta, velocidad, posicion):
     return - ACELERACION_GRAVEDAD+beta*exp(posicion/alpha)*(velocidad**2)
 
+def obtener_velocidad_y_altura():
+    
+
+
 
 def TP2():
 

@@ -43,8 +43,3 @@ def runge_kuta_orden_4(k, n, f, u0=0, t0=0):
 
 
     return un+(k/6)*(f(un, t0+n*k)+2*f(un_intermedio_1, t0+n*k+k/2))+2*f(un_intermedio_2, t0+n*k+k/2)+f(un_intermedio_3, t0+n*k+k))
-
-
-
-
-    return

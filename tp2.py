@@ -5,13 +5,15 @@
 
 from constant import *
 from metodos_numericos import *
-from math import *
+import math
+import csv
 
-def aceleracion(alpha, beta, velocidad, altura):
-    #argumentos: (alpha, beta, velocidad, posicion, t), t esta para
-    #que siga el formato
-    return - ACELERACION_GRAVEDAD+beta*exp(altura/alpha)*(velocidad**2)
+def aceleracion_primer_tramo(alpha, beta, velocidad, altura):
+    return - ACELERACION_GRAVEDAD+beta*math.exp(altura/alpha)*(velocidad**2)
 
+
+def aceleracion_tercer_tramo(n, velocidad):
+    return - ACELERACION_GRAVEDAD + n*(velocidad**2)
 
 """
 def velocidad(x):
@@ -51,19 +53,19 @@ def obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta):
         alturas.add(altura_actual)
 
         #q1_velocidad=k*f1(Xn,Yn)
-        q1_velocidad = k*aceleracion(alpha, beta, velocidad_actual, altura_actual)
+        q1_velocidad = k*aceleracion_primer_tramo(alpha, beta, velocidad_actual, altura_actual)
         #q2_altura=k*f2(Xn)<---Depende solo de la velocidad
         q1_altura = k*velocidad_actual
 
         #q2_velocidad=k*f1(Xn+q1x/2,Yn+q1y/2)
-        q2_velocidad = k*aceleracion(alpha, beta, velocidad_actual+0.5*q1_velocidad, altura_actual+0.5*q1_altura)
+        q2_velocidad = k*aceleracion_primer_tramo(alpha, beta, velocidad_actual+0.5*q1_velocidad, altura_actual+0.5*q1_altura)
         #q2_altura=k*f1(Xn+q1x/2)
         q2_altura = k*(velocidad_actual+0.5*q1_velocidad)
 
-        q3_velocidad = k*aceleracion(alpha, beta, velocidad_actual+0.5*q2_velocidad, altura_actual+0.5*q2_altura)
+        q3_velocidad = k*aceleracion_primer_tramo(alpha, beta, velocidad_actual+0.5*q2_velocidad, altura_actual+0.5*q2_altura)
         q3_altura = k*(velocidad_actual+0.5*q2_velocidad)
 
-        q4_velocidad = k*aceleracion(alpha, beta, velocidad_actual+q3_velocidad, altura_actual+0.5*q2_altura)
+        q4_velocidad = k*aceleracion_primer_tramo(alpha, beta, velocidad_actual+q3_velocidad, altura_actual+0.5*q2_altura)
         q4_altura = k*(velocidad_actual+q3_velocidad)
 
         velocidad_actual=velocidad_actual+(1/6)*(q1_velocidad+q2_velocidad+q3_velocidad+q4_velocidad)
@@ -71,8 +73,59 @@ def obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta):
 
     return velocidades, alturas
 
+def obtener_velocidad_y_altura_RK4_segundo_tramo():
+    return
+
+
+def obtener_velocidad_y_altura_RK4_tercer_tramo(k, n):
+
+    altura_actual = no_se
+    velocidad_actual = no_se
+    velocidades=[]
+    alturas=[]
+
+    while (altura_actual >= 0):
+
+        velocidades.add(velocidad_actual)
+        alturas.add(altura_actual)
+
+        #q1_velocidad=k*f1(Xn,Yn)
+        q1_velocidad = k*aceleracion_tercer_tramo(n, velocidad_actual)
+        #q2_altura=k*f2(Xn)<---Depende solo de la velocidad
+        q1_altura = k*velocidad_actual
+
+        #q2_velocidad=k*f1(Xn+q1x/2,Yn+q1y/2)
+        q2_velocidad = k*aceleracion_tercer_tramo(n, velocidad_actual+0.5*q1_velocidad)
+        #q2_altura=k*f1(Xn+q1x/2)
+        q2_altura = k*(velocidad_actual+0.5*q1_velocidad)
+
+        q3_velocidad = k*aceleracion_tercer_tramo(n, velocidad_actual+0.5*q2_velocidad)
+        q3_altura = k*(velocidad_actual+0.5*q2_velocidad)
+
+        q4_velocidad = k*aceleracion_tercer_tramo(n, velocidad_actual+q3_velocidad)
+        q4_altura = k*(velocidad_actual+q3_velocidad)
+
+        velocidad_actual=velocidad_actual+(1/6)*(q1_velocidad+q2_velocidad+q3_velocidad+q4_velocidad)
+        altura_actual=altura_actual+(1/6)*(q1_altura+q2_altura+q3_altura+q4_altura)
+
+    return velocidades, alturas
+
+
+
+
+def exportar_valores(nombre_archivo,errores):
+    with open(nombre_archivo+".csv", "w") as archivo_valores:
+        writer=csv.writer(archivo_valores)
+        listas_valores=map(lambda x:[x], valores)
+        for valor in listas_errores:
+            writer.writerow(valor)
+
+
+
+
 def TP2():
 
+    print("La velocidad maxima es: ", VELOCIDAD_MAXIMA)
 
 
     return

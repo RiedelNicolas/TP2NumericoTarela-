@@ -49,8 +49,8 @@ def obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta):
     RK4_con_valor_previo(k, n_inicial, n_final, f, u_inicial, t0)
         """
 
-        velocidades.add(velocidad_actual)
-        alturas.add(altura_actual)
+        velocidades.append(velocidad_actual)
+        alturas.append(altura_actual)
 
         #q1_velocidad=k*f1(Xn,Yn)
         q1_velocidad = k*aceleracion_primer_tramo(alpha, beta, velocidad_actual, altura_actual)
@@ -86,8 +86,14 @@ def obtener_velocidad_y_altura_RK4_tercer_tramo(k, n):
 
     while (altura_actual >= 0):
 
-        velocidades.add(velocidad_actual)
-        alturas.add(altura_actual)
+        velocidades.append(velocidad_actual)
+        alturas.append(altura_actual)
+
+        """
+        #BORRAR PRINTS
+        print(velocidad_actual)
+        print(altura_actual)
+        """
 
         #q1_velocidad=k*f1(Xn,Yn)
         q1_velocidad = k*aceleracion_tercer_tramo(n, velocidad_actual)
@@ -126,13 +132,37 @@ def obtener_alpha_y_beta():
     #HAY QUE IR PROBANDO VALORES DE ALPHA Y BETA PARA QUE LA CANTIDAD DE
     #TIEMPO DE CALIDA LIBRE Y LA VELOCIDAD MAXIMA SEA LA DEL TP
 
-    velocidades,alturas = obtener_velocidad_y_altura_RK4_primer_tramo(0.1, alpha, beta)
+    k=0.05
+
+    alpha_minimo=ALPHA_MINIMO
+    alpha_maximo=ALPHA_MAXIMO
+    alpha_medio=(alpha_minimo+alpha_maximo)/2
+
+    beta_minimo=BETA_MINIMO
+    beta_maximo=BETA_MAXIMO
+    beta_medio=(beta_minimo+beta_maximo)/2
+
+
+    velocidades,alturas = obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha_medio, beta_medio)
+    velocidad_maxima = abs(min(velocidades))
+    tiempo_caida_libre = len(alturas)*k
+    error_relativo_velocidad = abs(velocidad_maxima-VELOCIDAD_MAXIMA)/VELOCIDAD_MAXIMA
+    error_relativo_tiempo_caida_libre = abs(tiempo_caida_libre-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
+    while ((error_relativo_velocidad > 0.01)or(error_relativo_tiempo_caida_libre > 0.01)):
+        break
+
+
+
+    #print(velocidades)
+    #print(alturas)
+
+    print(abs(min(velocidades)))
 
 
 def TP2():
 
     print("La velocidad maxima es: ", VELOCIDAD_MAXIMA)
-
+    obtener_alpha_y_beta()
 
 
 

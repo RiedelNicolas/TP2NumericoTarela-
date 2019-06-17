@@ -36,7 +36,7 @@ def obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta):
     velocidades=[]
     alturas=[]
 
-    while (altura_actual > ALTURA_APERTURA_PARACAIDAS):
+    while (altura_actual >= ALTURA_APERTURA_PARACAIDAS):
 
         """
         velocidad_intermedia_1=calculo_intermedio_1_RK4(k, alpha, beta, velocidad_actual, posicion)
@@ -120,12 +120,21 @@ def exportar_valores(nombre_archivo,errores):
         for valor in listas_errores:
             writer.writerow(valor)
 
+def obtener_alpha_y_beta():
 
+    #LA VELOCIDAD MAXIMA ES EN CAIDA LIBRE
+    #HAY QUE IR PROBANDO VALORES DE ALPHA Y BETA PARA QUE LA CANTIDAD DE
+    #TIEMPO DE CALIDA LIBRE Y LA VELOCIDAD MAXIMA SEA LA DEL TP
+
+    velocidades,alturas = obtener_velocidad_y_altura_RK4_primer_tramo(0.1, alpha, beta)
 
 
 def TP2():
 
     print("La velocidad maxima es: ", VELOCIDAD_MAXIMA)
+
+
+
 
 
     return

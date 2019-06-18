@@ -72,7 +72,11 @@ def obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta):
 
     return velocidades, alturas
 
-def obtener_velocidad_y_altura_RK4_segundo_tramo(k, n, altura_inicial, velocidad_inicial):
+
+
+#Guarda en el ultimo lugar de cada lista la altura y velocidad del instante siguiente
+#al intervalo
+def obtener_velocidad_y_altura_RK4_segundo_tramo(k, n, factor, velocidad_inicial):
 
     altura_actual = altura_inicial
     velocidad_actual = velocidad_inicial
@@ -83,35 +87,38 @@ def obtener_velocidad_y_altura_RK4_segundo_tramo(k, n, altura_inicial, velocidad
 
     while (k*paso_actual <= 3):
 
-        velocidades.append(velocidad_actual)
-        alturas.append(altura_actual)
-
         #q1_velocidad=k*f1(Xn,Yn)
-        q1_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(t-tiempo_inicial), velocidad)
+        q1_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(k*paso_actual), velocidad)
         #q2_altura=k*f2(Xn)<---Depende solo de la velocidad
         q1_altura = k*velocidad_actual
 
         #q2_velocidad=k*f1(Xn+q1x/2,Yn+q1y/2)
-        q2_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(t-tiempo_inicial), velocidad_actual+0.5*q1_velocidad)
+        q2_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(k*paso_actual+k/2), velocidad_actual+0.5*q1_velocidad)
         #q2_altura=k*f1(Xn+q1x/2)
         q2_altura = k*(velocidad_actual+0.5*q1_velocidad)
 
-        q3_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(t-tiempo_inicial), velocidad_actual+0.5*q2_velocidad)
+        q3_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(k*paso_actual+k/2), velocidad_actual+0.5*q2_velocidad)
         q3_altura = k*(velocidad_actual+0.5*q2_velocidad)
 
-        q4_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(t-tiempo_inicial), velocidad_actual+q3_velocidad)
+        q4_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(k*paso_actual+k), velocidad_actual+q3_velocidad)
         q4_altura = k*(velocidad_actual+q3_velocidad)
 
         velocidad_actual=velocidad_actual+(1/6)*(q1_velocidad+2*q2_velocidad+2*q3_velocidad+q4_velocidad)
         altura_actual=altura_actual+(1/6)*(q1_altura+2*q2_altura+2*q3_altura+q4_altura)
 
+        velocidades.append(velocidad_actual)
+        alturas.append(altura_actual)
+
         paso_actual+=1
 
-    return velocidades, alturas
+    diferencia_de_tiempo=k*paso_actual
+
+    n_actual=beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(k*paso_actual)
+
+    return velocidades, alturas, n_actual, diferencia_de_tiempo
 
 
-
-def obtener_velocidad_y_altura_RK4_tercer_tramo(k, n, altura_inicial, velocidad_inicial):
+def obtener_velocidad_y_altura_RK4_tercer_tramo(k, n, altura_inicial, velocidad_inicial, tiempo_inicial):
 
     altura_actual = altura_inicial
     velocidad_actual = velocidad_inicial
@@ -153,96 +160,6 @@ def exportar_valores(nombre_archivo, valores):
         listas_valores=map(lambda x:[x], valores)
         for valor in listas_valores:
             writer.writerow(valor)
-
-
-def obtener_alpha_y_beta():
-
-    #LA VELOCIDAD MAXIMA ES EN CAIDA LIBRE
-    #HAY QUE IR PROBANDO VALORES DE ALPHA Y BETA PARA QUE LA CANTIDAD DE
-    #TIEMPO DE CALIDA LIBRE Y LA VELOCIDAD MAXIMA SEA LA DEL TP
-
-    k=0.05
-
-    alpha_minimo=ALPHA_MINIMO
-    alpha_maximo=ALPHA_MAXIMO
-    alpha_medio=(alpha_minimo+alpha_maximo)/2
-    alpha_aux_1=0
-    alpha_aux_2=0
-
-    beta_minimo=BETA_MINIMO
-    beta_maximo=BETA_MAXIMO
-    beta_medio=(beta_minimo+beta_maximo)/2
-    beta_aux_1=0
-    beta_aux_2=0
-
-    velocidades,alturas = obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha_medio, beta_medio)
-    velocidad_maxima = abs(min(velocidades))
-    tiempo_caida_libre = len(alturas)*k
-    error_relativo_velocidad = abs(velocidad_maxima-VELOCIDAD_MAXIMA)/VELOCIDAD_MAXIMA
-    error_relativo_tiempo_caida_libre = abs(tiempo_caida_libre-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
-
-    #while ((error_relativo_velocidad > 0.01)or(error_relativo_tiempo_caida_libre > 0.01)):
-
-    while (error_relativo_velocidad > 0.005 or error_relativo_tiempo_caida_libre > 0.005):
-
-        beta_aux_1=(beta_minimo+beta_medio)/2
-        beta_aux_2=(beta_maximo+beta_medio)/2
-
-        velocidades_b_aux_1,alturas_b_aux_1 = obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha_medio, beta_aux_1)
-        velocidades_b_aux_2,alturas_b_aux_2 = obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha_medio, beta_aux_2)
-
-        velocidad_maxima_b_aux_1 = abs(min(velocidades_b_aux_1))
-        velocidad_maxima_b_aux_2 = abs(min(velocidades_b_aux_2))
-
-        error_relativo_velocidad_b_aux_1 = abs(velocidad_maxima_b_aux_1-VELOCIDAD_MAXIMA)/VELOCIDAD_MAXIMA
-        error_relativo_velocidad_b_aux_2 = abs(velocidad_maxima_b_aux_2-VELOCIDAD_MAXIMA)/VELOCIDAD_MAXIMA
-
-        if error_relativo_velocidad_b_aux_1<error_relativo_velocidad_b_aux_2:
-            beta_maximo=beta_medio
-            beta_medio=beta_aux_1
-            velocidad_maxima=velocidad_maxima_b_aux_1
-        else:
-            beta_minimo=beta_medio
-            beta_medio=beta_aux_2
-            velocidad_maxima=velocidad_maxima_b_aux_2
-
-        while (error_relativo_tiempo_caida_libre > 0.05):
-
-            alpha_aux_1=(alpha_minimo+alpha_medio)/2
-            alpha_aux_2=(alpha_maximo+alpha_medio)/2
-
-            velocidades_a_aux_1,alturas_a_aux_1 = obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha_aux_1, beta_medio)
-            velocidades_a_aux_2,alturas_a_aux_2 = obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha_aux_2, beta_medio)
-
-            tiempo_caida_libre_a_aux_1 = len(alturas_a_aux_1)*k
-            tiempo_caida_libre_a_aux_2 = len(alturas_a_aux_2)*k
-
-            error_relativo_tiempo_caida_libre_alpha_aux1 = abs(tiempo_caida_libre_a_aux_1-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
-            error_relativo_tiempo_caida_libre_alpha_aux2 = abs(tiempo_caida_libre_a_aux_2-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
-
-            if error_relativo_tiempo_caida_libre_alpha_aux1<error_relativo_tiempo_caida_libre_alpha_aux2:
-                alpha_maximo=alpha_medio
-                alpha_medio=alpha_aux_1
-                tiempo_caida_libre=tiempo_caida_libre_a_aux_1
-            else:
-                alpha_minimo=alpha_medio
-                alpha_medio=alpha_aux_2
-                tiempo_caida_libre=tiempo_caida_libre_a_aux_2
-
-
-            print("Alpha:", alpha_medio)
-            print("Beta:", beta_medio)
-            print("Velocidad maxima", velocidad_maxima)
-            print("Tiempo caida libre:", tiempo_caida_libre)
-            print("Error velocidad_maxima:", VELOCIDAD_MAXIMA-velocidad_maxima)
-            print("Error tiempo caida libre: ", TIEMPO_CAIDA_LIBRE-tiempo_caida_libre)
-
-    #print(velocidades)
-    #print(alturas)
-    print("Alpha:", alpha_medio)
-    print("Beta:", beta_medio)
-    print("Velocidad maxima", velocidad_maxima)
-    print("Tiempo caida libre:", tiempo_caida_libre)
 
 
 def obtener_alpha_y_beta_2():
@@ -297,8 +214,27 @@ def obtener_alpha_y_beta_2():
             beta=BETA_MINIMO
             alpha+=diferencia_alpha
 
+    return
+
+
+def obtener_n(tiempo_transcurrido, alpha, beta):
+
+    k=0.1
+
+    factor_maximo=(1-beta*math.exp(1500/alpha))/3
+    factor_minimo=(0.1-beta*math.exp(1500/alpha))/3
+
+    print("Factor maximo:", factor_maximo)
+    print("Factor minimo:", factor_minimo)
+
+    velocidades_segundo_tramo, alturas_segundo_tramo, n, diferencia_de_tiempo = obtener_velocidad_y_altura_RK4_segundo_tramo(k, factor_minimo, altura_inicial, velocidad_inicial)
+    velocidades_tercer_tramo, alturas_tercer_tramo = obtener_velocidad_y_altura_RK4_tercer_tramo(k, n, alturas_segundo_tramo[len(alturas_segundo_tramo)-1], velocidades_segundo_tramo[len(velocidades_segundo_tramo)-1], tiempo_transcurrido+diferencia_de_tiempo)
+
+    tiempo_total=tiempo_transcurrido+diferencia_de_tiempo+len(alturas_tercer_tramo)
+    print("Tiempo total:", tiempo_total)
 
     return
+
 
 
 def TP2():
@@ -318,13 +254,17 @@ def TP2():
     exportar_valores("velocidades_tramo_1", map(lambda x:-x, velocidades))
     exportar_valores("alturas_tramo_1", alturas)
 
-
     #QUE VALOR SE USA AL ABRIR EL PARACAIDAS? EL SIGUIENTE QUE SE TENDRIA
     #SI NO SE HUBIESE ABIERTO?
 
     #se usa -2 porque en la ultima posicion se guarda el valor despues de abrir el paracaidas
     print("Velocidad terminal: ",abs(velocidades[len(velocidades)-2]))
 
+
+    #SACAR QUE SE CALCULA LA VELOCIDAD Y ALTURA DEL PRIMER PASO DEL METODO SIGUIENTE
+    #CON EL METODO ANTERIOR
+
+    obtener_n(k*len(velocidades), alpha, beta)
 
     return
 

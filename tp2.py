@@ -102,12 +102,13 @@ def obtener_velocidad_y_altura_RK4_tercer_tramo(k, n):
 
 
 
-def exportar_valores(nombre_archivo,errores):
+def exportar_valores(nombre_archivo, valores):
     with open(nombre_archivo+".csv", "w") as archivo_valores:
         writer=csv.writer(archivo_valores)
         listas_valores=map(lambda x:[x], valores)
-        for valor in listas_errores:
+        for valor in listas_valores:
             writer.writerow(valor)
+
 
 def obtener_alpha_y_beta():
 
@@ -137,7 +138,7 @@ def obtener_alpha_y_beta():
 
     #while ((error_relativo_velocidad > 0.01)or(error_relativo_tiempo_caida_libre > 0.01)):
 
-    while (error_relativo_velocidad > 0.5 or error_relativo_tiempo_caida_libre > 0.5):
+    while (error_relativo_velocidad > 0.005 or error_relativo_tiempo_caida_libre > 0.005):
 
         beta_aux_1=(beta_minimo+beta_medio)/2
         beta_aux_2=(beta_maximo+beta_medio)/2
@@ -169,10 +170,10 @@ def obtener_alpha_y_beta():
             velocidades_a_aux_2,alturas_a_aux_2 = obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha_aux_2, beta_medio)
 
             tiempo_caida_libre_a_aux_1 = len(alturas_a_aux_1)*k
-            tiempo_caida_libre_a_aux_2 = len(alturas_a_aux_1)*k
+            tiempo_caida_libre_a_aux_2 = len(alturas_a_aux_2)*k
 
-            error_relativo_tiempo_caida_libre_alpha_aux1 = abs(tiempo_caida_libre-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
-            error_relativo_tiempo_caida_libre_alpha_aux2 = abs(tiempo_caida_libre-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
+            error_relativo_tiempo_caida_libre_alpha_aux1 = abs(tiempo_caida_libre_a_aux_1-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
+            error_relativo_tiempo_caida_libre_alpha_aux2 = abs(tiempo_caida_libre_a_aux_2-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
 
             if error_relativo_tiempo_caida_libre_alpha_aux1<error_relativo_tiempo_caida_libre_alpha_aux2:
                 alpha_maximo=alpha_medio
@@ -188,6 +189,8 @@ def obtener_alpha_y_beta():
             print("Beta:", beta_medio)
             print("Velocidad maxima", velocidad_maxima)
             print("Tiempo caida libre:", tiempo_caida_libre)
+            print("Error velocidad_maxima:", VELOCIDAD_MAXIMA-velocidad_maxima)
+            print("Error tiempo caida libre: ", TIEMPO_CAIDA_LIBRE-tiempo_caida_libre)
 
     #print(velocidades)
     #print(alturas)
@@ -257,26 +260,19 @@ def TP2():
 
     print("La velocidad maxima es: ", VELOCIDAD_MAXIMA)
     #obtener_alpha_y_beta()
+    #obtener_alpha_y_beta_2()
 
-    alpha=9000
-    beta=0.001
+    alpha=6496
+    beta=0.00480
     k=0.1
-    #velocidades,alturas=obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta)
+    velocidades,alturas=obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta)
 
+    #print(velocidades)
     #print(alturas)
 
-    """
-    velocidad_maxima_actual=abs(min(velocidades))
-    tiempo_de_caida_actual=len(alturas)*k
+    exportar_valores("velocidades_tramo_1", map(lambda x:-x, velocidades))
+    exportar_valores("alturas_tramo_1", alturas)
 
-    print("Alpha:", alpha)
-    print("Beta:", beta)
-    print("Velocidad maxima:", velocidad_maxima_actual)
-    print("Diferencia velocidad maxima", VELOCIDAD_MAXIMA-velocidad_maxima_actual)
-    print("Tiempo de caida libre:", tiempo_de_caida_actual)
-    print("Diferencia tiempo de caida:", TIEMPO_CAIDA_LIBRE-tiempo_de_caida_actual)
-    """
-    obtener_alpha_y_beta_2()
     return
 
 TP2()

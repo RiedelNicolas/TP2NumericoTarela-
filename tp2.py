@@ -12,8 +12,15 @@ def aceleracion_primer_tramo(alpha, beta, velocidad, altura):
     return - ACELERACION_GRAVEDAD+beta*math.exp(-altura/alpha)*(velocidad**2)
 
 
-def aceleracion_tercer_tramo(n, velocidad):
+#def aceleracion_segundo_tramo(factor, velocidad, t, tiempo_inicial, alpha, beta):
+#    return - ACELERACION_GRAVEDAD + (beta*math.exp(1500/alpha)+factor*(t-tiempo_inicial))*(velocidad**2)
+
+def aceleracion_segundo_y_tercer_tramo(n, velocidad):
     return - ACELERACION_GRAVEDAD + n*(velocidad**2)
+
+
+#def aceleracion_tercer_tramo(n, velocidad):
+#    return - ACELERACION_GRAVEDAD + n*(velocidad**2)
 
 """
 def velocidad(x):
@@ -29,17 +36,17 @@ def calculo_intermedio_3_RK4(k, alpha, beta, velocidad, velocidad_intermedia_2, 
     return un+k*aceleracion(alpha, beta, velocidad_intermedia_2, altura)
 """
 
+
+#Guarda en el ultimo lugar de cada lista la altura y velocidad del instante siguiente
+#al intervalo
 def obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta):
 
     altura_actual = ALTURA_INICIAL
     velocidad_actual = VELOCIDAD_INICIAL
-    velocidades=[]
-    alturas=[]
+    velocidades=[VELOCIDAD_INICIAL]
+    alturas=[ALTURA_INICIAL]
 
     while (altura_actual >= ALTURA_APERTURA_PARACAIDAS):
-
-        velocidades.append(velocidad_actual)
-        alturas.append(altura_actual)
 
         #q1_velocidad=k*f1(Xn,Yn)
         q1_velocidad = k*aceleracion_primer_tramo(alpha, beta, velocidad_actual, altura_actual)
@@ -60,16 +67,54 @@ def obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta):
         velocidad_actual=velocidad_actual+(1/6)*(q1_velocidad+2*q2_velocidad+2*q3_velocidad+q4_velocidad)
         altura_actual=altura_actual+(1/6)*(q1_altura+2*q2_altura+2*q3_altura+q4_altura)
 
+        velocidades.append(velocidad_actual)
+        alturas.append(altura_actual)
+
     return velocidades, alturas
 
-def obtener_velocidad_y_altura_RK4_segundo_tramo():
-    return
+def obtener_velocidad_y_altura_RK4_segundo_tramo(k, n, altura_inicial, velocidad_inicial):
+
+    altura_actual = altura_inicial
+    velocidad_actual = velocidad_inicial
+    velocidades=[velocidad_inicial]
+    alturas=[altura_inicial]
+
+    paso_actual=1
+
+    while (k*paso_actual <= 3):
+
+        velocidades.append(velocidad_actual)
+        alturas.append(altura_actual)
+
+        #q1_velocidad=k*f1(Xn,Yn)
+        q1_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(t-tiempo_inicial), velocidad)
+        #q2_altura=k*f2(Xn)<---Depende solo de la velocidad
+        q1_altura = k*velocidad_actual
+
+        #q2_velocidad=k*f1(Xn+q1x/2,Yn+q1y/2)
+        q2_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(t-tiempo_inicial), velocidad_actual+0.5*q1_velocidad)
+        #q2_altura=k*f1(Xn+q1x/2)
+        q2_altura = k*(velocidad_actual+0.5*q1_velocidad)
+
+        q3_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(t-tiempo_inicial), velocidad_actual+0.5*q2_velocidad)
+        q3_altura = k*(velocidad_actual+0.5*q2_velocidad)
+
+        q4_velocidad = k*aceleracion_segundo_y_tercer_tramo(beta*math.exp(ALTURA_APERTURA_PARACAIDAS/alpha)+factor*(t-tiempo_inicial), velocidad_actual+q3_velocidad)
+        q4_altura = k*(velocidad_actual+q3_velocidad)
+
+        velocidad_actual=velocidad_actual+(1/6)*(q1_velocidad+2*q2_velocidad+2*q3_velocidad+q4_velocidad)
+        altura_actual=altura_actual+(1/6)*(q1_altura+2*q2_altura+2*q3_altura+q4_altura)
+
+        paso_actual+=1
+
+    return velocidades, alturas
 
 
-def obtener_velocidad_y_altura_RK4_tercer_tramo(k, n):
 
-    altura_actual = no_se
-    velocidad_actual = no_se
+def obtener_velocidad_y_altura_RK4_tercer_tramo(k, n, altura_inicial, velocidad_inicial):
+
+    altura_actual = altura_inicial
+    velocidad_actual = velocidad_inicial
     velocidades=[]
     alturas=[]
 
@@ -272,6 +317,14 @@ def TP2():
 
     exportar_valores("velocidades_tramo_1", map(lambda x:-x, velocidades))
     exportar_valores("alturas_tramo_1", alturas)
+
+
+    #QUE VALOR SE USA AL ABRIR EL PARACAIDAS? EL SIGUIENTE QUE SE TENDRIA
+    #SI NO SE HUBIESE ABIERTO?
+
+    #se usa -2 porque en la ultima posicion se guarda el valor despues de abrir el paracaidas
+    print("Velocidad terminal: ",abs(velocidades[len(velocidades)-2]))
+
 
     return
 

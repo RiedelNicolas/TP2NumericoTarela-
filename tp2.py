@@ -255,13 +255,13 @@ def obtener_alpha_y_beta():
     error_relativo_velocidad = abs(velocidad_maxima_actual-VELOCIDAD_MAXIMA)/VELOCIDAD_MAXIMA
     error_relativo_tiempo_caida_libre = abs(tiempo_de_caida_actual-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
 
-    print("Alpha:", alpha)
-    print("Beta:", beta)
-    print("Velocidad maxima:", velocidad_maxima_actual)
-    print("Diferencia velocidad maxima", VELOCIDAD_MAXIMA-velocidad_maxima_actual)
-    print("Tiempo de caida libre:", tiempo_de_caida_actual)
-    print("Diferencia tiempo de caida:", TIEMPO_CAIDA_LIBRE-tiempo_de_caida_actual)
-    print()
+    #print("Alpha:", alpha)
+    #print("Beta:", beta)
+    #print("Velocidad maxima:", velocidad_maxima_actual)
+    #print("Diferencia velocidad maxima", VELOCIDAD_MAXIMA-velocidad_maxima_actual)
+    #print("Tiempo de caida libre:", tiempo_de_caida_actual)
+    #print("Diferencia tiempo de caida:", TIEMPO_CAIDA_LIBRE-tiempo_de_caida_actual)
+    #print()
 
     while (error_relativo_velocidad > 0.005 or error_relativo_tiempo_caida_libre > 0.005):
 
@@ -273,13 +273,13 @@ def obtener_alpha_y_beta():
         error_relativo_velocidad = abs(velocidad_maxima_actual-VELOCIDAD_MAXIMA)/VELOCIDAD_MAXIMA
         error_relativo_tiempo_caida_libre = abs(tiempo_de_caida_actual-TIEMPO_CAIDA_LIBRE)/TIEMPO_CAIDA_LIBRE
 
-        print("Alpha:", alpha)
-        print("Beta:", beta)
-        print("Velocidad maxima:", velocidad_maxima_actual)
-        print("Diferencia velocidad maxima", VELOCIDAD_MAXIMA-velocidad_maxima_actual)
-        print("Tiempo de caida libre:", tiempo_de_caida_actual)
-        print("Diferencia tiempo de caida:", TIEMPO_CAIDA_LIBRE-tiempo_de_caida_actual)
-        print()
+        #print("Alpha:", alpha)
+        #print("Beta:", beta)
+        #print("Velocidad maxima:", velocidad_maxima_actual)
+        #print("Diferencia velocidad maxima", VELOCIDAD_MAXIMA-velocidad_maxima_actual)
+        #print("Tiempo de caida libre:", tiempo_de_caida_actual)
+        #print("Diferencia tiempo de caida:", TIEMPO_CAIDA_LIBRE-tiempo_de_caida_actual)
+        #print()
 
         beta+=diferencia_beta
 
@@ -298,8 +298,8 @@ def obtener_n(ultima_altura, ultima_velocidad, tiempo_transcurrido, alpha, beta)
 
     factor_actual=factor_minimo
 
-    print("Factor maximo:", factor_maximo)
-    print("Factor minimo:", factor_minimo)
+    #print("Factor maximo:", factor_maximo)
+    #print("Factor minimo:", factor_minimo)
 
     cambio_factor=0.001
 
@@ -307,7 +307,7 @@ def obtener_n(ultima_altura, ultima_velocidad, tiempo_transcurrido, alpha, beta)
     velocidades_tercer_tramo, alturas_tercer_tramo = obtener_velocidad_y_altura_RK4_tercer_tramo(k, n, alturas_segundo_tramo[len(alturas_segundo_tramo)-1], velocidades_segundo_tramo[len(velocidades_segundo_tramo)-1])
 
     tiempo_total=tiempo_transcurrido+diferencia_de_tiempo+len(alturas_tercer_tramo)
-    print("Tiempo total:", tiempo_total)
+    #print("Tiempo total:", tiempo_total)
 
 
     error_relativo_tiempo_total=abs(TIEMPO_TOTAL_SALTO-tiempo_total)/TIEMPO_TOTAL_SALTO
@@ -317,11 +317,11 @@ def obtener_n(ultima_altura, ultima_velocidad, tiempo_transcurrido, alpha, beta)
         velocidades_tercer_tramo, alturas_tercer_tramo = obtener_velocidad_y_altura_RK4_tercer_tramo(k, n, alturas_segundo_tramo[len(alturas_segundo_tramo)-1], velocidades_segundo_tramo[len(velocidades_segundo_tramo)-1])
 
         tiempo_total=tiempo_transcurrido+diferencia_de_tiempo+len(alturas_tercer_tramo)*k
-        print("Factor:", factor_actual)
-        print("n:", n)
-        print("Tiempo total:", tiempo_total)
-        print("Diferencia con tiempo total real:", TIEMPO_TOTAL_SALTO-tiempo_total)
-        print()
+        #print("Factor:", factor_actual)
+        #print("n:", n)
+        #print("Tiempo total:", tiempo_total)
+        #print("Diferencia con tiempo total real:", TIEMPO_TOTAL_SALTO-tiempo_total)
+        #print()
         error_relativo_tiempo_total=abs(TIEMPO_TOTAL_SALTO-tiempo_total)/TIEMPO_TOTAL_SALTO
         factor_actual+=cambio_factor
 
@@ -331,9 +331,9 @@ def operar_con_RK4(alpha, beta, n, k):
 
     velocidades_primer_tramo,alturas_primer_tramo=obtener_velocidad_y_altura_RK4_primer_tramo(k, alpha, beta)
 
-    n=obtener_n(alturas_primer_tramo[len(alturas_primer_tramo)-1], velocidades_primer_tramo[len(velocidades_primer_tramo)-1], (len(velocidades_primer_tramo)-1)*k, alpha, beta)
+    #n=obtener_n(alturas_primer_tramo[len(alturas_primer_tramo)-1], velocidades_primer_tramo[len(velocidades_primer_tramo)-1], (len(velocidades_primer_tramo)-1)*k, alpha, beta)
 
-    print("El valor de n es:", n)
+    #print("El valor de n es:", n)
 
     factor=(n-beta*math.exp(-ALTURA_APERTURA_PARACAIDAS/alpha))/3
     velocidades_segundo_tramo,alturas_segundo_tramo, n_actual, diferencia_de_tiempo=obtener_velocidad_y_altura_RK4_segundo_tramo(k, factor, velocidades_primer_tramo[len(velocidades_primer_tramo)-1], alturas_primer_tramo[len(alturas_primer_tramo)-1], alpha, beta)
@@ -453,14 +453,14 @@ def TP2():
     print("La velocidad maxima exacta es: ", VELOCIDAD_MAXIMA)
     alpha_calculada,beta_calculada=obtener_alpha_y_beta()
 
-    print("Alpha:", alpha_calculada)
-    print("Beta:", beta_calculada)
-
-
     alpha=6496
     beta=0.00480
     k=0.1
     n=0.3884
+    print("Alpha:", alpha_calculada)
+    print("Beta:", beta_calculada)
+    print("n:", n)
+
 
     velocidades_RK4, alturas_RK4, velocidad_terminal, g=operar_con_RK4(alpha, beta, n, k)
 
